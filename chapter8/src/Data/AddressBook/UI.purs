@@ -6,6 +6,7 @@ import Data.Foreign
 import Data.Foreign.Class
 import Data.AddressBook
 import Data.AddressBook.Validation
+import Data.Validation
 
 import Data.Traversable
 
@@ -46,7 +47,7 @@ displayValidationErrors errs = do
 
   return unit
 
-validateControls :: forall eff. Eff (trace :: Trace, dom :: DOM | eff) (Either [String] Person)
+validateControls :: forall eff. Eff (trace :: Trace, dom :: DOM | eff) (V Errors Person)
 validateControls = do
   trace "Running validators"
 
@@ -68,9 +69,7 @@ validateAndUpdateUI = do
 
   errorsOrResult <- validateControls
 
-  case errorsOrResult of
-    Left errs -> displayValidationErrors errs
-    Right result -> print result
+  runV displayValidationErrors print errorsOrResult
 
   return unit
 
